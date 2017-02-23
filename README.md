@@ -2,14 +2,14 @@ Generic MQTT IOT device code for ESP8266
 
 This code is meant to control the following:
 
-	Relays (SSR or conventional) Both hook up with D1 as a control pin.
+Relays (SSR or conventional) Both hook up with D1 as a control pin.
 
-	Infrared remote emulation (Feature not implemented yet.)
+Infrared remote emulation (Feature not implemented yet.)
 
-	Computer power button press emulation (Computer should be hooked up with computer GND shared with the ESP, 
-		USB+ into A0 on the ESP, and the D5 spliced into the sense pin attached to the computer's power switch.) 
-		There are two pins attached to a computer's power button, sense and GND. You want the one that doesn't read as GND.
-		
+Computer power button press emulation (Computer should be hooked up with computer GND shared with the ESP, 
+  USB+ into A0 on the ESP, and the D5 spliced into the sense pin attached to the computer's power switch.) 
+  There are two pins attached to a computer's power button, sense and GND. You want the one that doesn't read as GND.
+	
 To get started, add a file called Secrets.h to your sketch directory. It should look like:
 
 ```
