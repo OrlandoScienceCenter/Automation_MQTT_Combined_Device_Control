@@ -10,6 +10,7 @@ Computer power button press emulation (Computer should be hooked up with compute
   USB+ into A0 on the ESP, and the D5 spliced into the sense pin attached to the computer's power switch.) 
   There are two pins attached to a computer's power button, sense and GND. You want the one that doesn't read as GND.
 	
+	
 To get started, add a file called Secrets.h to your sketch directory. It should look like:
 
 ```
