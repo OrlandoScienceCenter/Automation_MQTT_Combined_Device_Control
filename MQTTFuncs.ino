@@ -5,6 +5,7 @@ extern char msg[150];
 extern int value;
 extern int curQueryStat;
 extern int OTAReadyFlag;
+extern int startup_flag;
 
 void callback(char* topic, byte* payload, unsigned int length) {
   String payloadStr = "";
@@ -14,10 +15,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) {
     payloadStr += ((char)payload[i]);
   }
-  
+
   Serial.println(payloadStr);
 
-  // powerOff, powerOn, getStatus, startOTA, resetESP
+  // powerOff, powerOn, getStatus, startOTA, powerReset, resetESP
 
   // powerOff
   if (payloadStr.equals("powerOff")) {
@@ -29,7 +30,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       powerOffComputer();
     }
 
-  // powerOn
+    // powerOn
   } else if (payloadStr.equals("powerOn")) {
     digitalWrite(BUILTIN_LED, LOW);  // Turn the LED on
     if (deviceIsRelay) {
@@ -39,7 +40,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       powerOnComputer();
     }
 
-  // getStatus
+    // getStatus
   } else if (payloadStr.equals("getStatus")) {
     if (deviceIsComputer) {
       if (analogRead(A0) > 900) {
@@ -55,13 +56,29 @@ void callback(char* topic, byte* payload, unsigned int length) {
       client.publish(DEVICE_TOPIC, msg);
     }
 
-  // startOTA
-  } else if (payloadStr.equals("startOTA")) { 
+    // startOTA
+  } else if (payloadStr.equals("startOTA")) {
     client.publish(DEVICE_TOPIC, "Device is now OTA Programmable for the next 5 minutes");
     OTAUntilMillis = now + 300 * SECONDS; // 5 minutes
 
-  // resetESP
-  } else if (payloadStr.equals("resetESP")) { 
+    // powerReset
+  } else if (payloadStr.equals("powerReset")) {
+    client.publish(DEVICE_TOPIC, "Device is now power-cycling whatever is attached.");
+    delay(500);
+
+    if (deviceIsRelay) {
+      powerOffRelay();
+    }
+    if (deviceIsComputer) {
+      powerOffComputer();
+    }
+
+    // Then these two lines make it do the auto startup after delay in the main loop.
+    delayTime = STARTUP_DELAY_SECONDS * SECONDS + now;
+    startup_flag = 0;
+
+    // resetESP
+  } else if (payloadStr.equals("resetESP")) {
     client.publish(DEVICE_TOPIC, "Device is now resetting the ESP8266");
     delay(500);
     ESP.restart();
