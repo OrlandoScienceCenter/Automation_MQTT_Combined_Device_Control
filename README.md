@@ -24,8 +24,10 @@ const char* mqtt_server = "MQTT_SERVER_IP_OR_URL";
 
 And that's it. Set what device type you want to control via the global variables in the main sketch file and configure a delay time on startup.
 
-Commands you can send to devices are: powerOff, powerOn, getStatus, startOTA, resetESP
+Commands you can send to devices are: powerOff, powerOn, getStatus, startOTA, powerReset, resetESP
 
 Most of these should be self-explanatory, getStatus returns 1 if on, 0 if the device is off.
 
 startOTA sets up the ESP to be programmable OTA for five minutes. Note that if you start OTA but don't program it within the 5 minute timeout, the hostname will persist in your ports menu in the arduino IDE until you reset the ESP. This is good for keeping clutter in your ports menu down.
+
+powerReset power-cycles the exhibit, leaving it off for whatever startup delay time was specified in the main arduino sketch
