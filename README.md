@@ -9,8 +9,19 @@ Infrared remote emulation (Feature not implemented yet.)
 Computer power button press emulation (Computer should be hooked up with computer GND shared with the ESP, 
   USB+ into A0 on the ESP, and the D5 spliced into the sense pin attached to the computer's power switch.) 
   There are two pins attached to a computer's power button, sense and GND. You want the one that doesn't read as GND.
-	
-	
+
+```
+Pins:
+  Computer Control: 
+    GND - USB - from computer
+    A0 -- USB + from computer
+    D5 -- Spliced into the sense wire side of the power button
+  
+  Relay Control:
+    D1 -- Relay Control +
+    GND - Relay Control -
+```
+
 To get started, add a file called Secrets.h to your sketch directory. It should look like:
 
 ```
