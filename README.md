@@ -25,12 +25,14 @@ Pins:
 To get started, add a file called Secrets.h to your sketch directory. It should look like:
 
 ```
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PSK";
-const char* mqtt_server = "MQTT_SERVER_IP_OR_URL";
+#define FLOOR_F "FLOORNUMBER"
+#define ROOM_R "ROOMNAME"
+#define OTA_HOSTNAME "DEVICENAME"
+#define STARTUP_DELAY_SECONDS 20  // Number of seconds on power applied before device actually turns on. For power outages, restarts, etc...
 
-#define DEVICE_TOPIC "your/topic/here/DemoRelay1"
-#define OTA_HOSTNAME "DemoRelay1"
+const char* ssid = "YOURSSID";
+const char* password = "YOURPASSWORD";
+const char* mqtt_server = "YOURMQTTSERVERIPORURL";
 ```
 
 And that's it. Set what device type you want to control via the global variables in the main sketch file and configure a delay time on startup.
