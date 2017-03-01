@@ -1,11 +1,15 @@
 extern unsigned long OTAUntilMillis;
 extern unsigned long now;
-extern long lastMsg;
+extern unsigned long computerPowerOffTimeout;
+
 extern char msg[150];
+
 extern int value;
 extern int curQueryStat;
 extern int OTAReadyFlag;
-extern int startup_flag;
+extern int startupFlag;
+extern int computerPowerOffCheckingFlag;
+extern int computerNeedsToTurnBackOnFlag;
 
 void callback(char* topic, byte* payload, unsigned int length) {
   String payloadStr = "";
@@ -28,6 +32,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     if (deviceIsComputer) {
       powerOffComputer();
+      
+      computerPowerOffByTimeout = now + (120 * SECONDS);
+      computerPowerOffCheckingFlag = 1;
+      computerNeedsToTurnBackOnFlag = 0;
     }
 
     // powerOn
@@ -68,15 +76,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     if (deviceIsRelay) {
       powerOffRelay();
+      // Then these two lines make it do the auto startup after delay in the main loop.
+      delayTime = STARTUP_DELAY_SECONDS * SECONDS + now;
+      startupFlag = 0;
     }
+
     if (deviceIsComputer) {
       powerOffComputer();
+      
+      computerPowerOffByTimeout = now + (120 * SECONDS);
+      computerPowerOffCheckingFlag = 1;
+      computerNeedsToTurnBackOnFlag = 1;
     }
-
-    // Then these two lines make it do the auto startup after delay in the main loop.
-    delayTime = STARTUP_DELAY_SECONDS * SECONDS + now;
-    startup_flag = 0;
-
+    
     // resetESP
   } else if (payloadStr.equals("resetESP")) {
     client.publish(DEVICE_TOPIC, "Device is now resetting the ESP8266");

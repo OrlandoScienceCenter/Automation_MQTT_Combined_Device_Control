@@ -5,30 +5,35 @@
 #include "Secrets.h"
 #define SECONDS 1000
 
-// To change this code for a new device, make sure these four below lines are correct,
+// To change this code for a new device, make sure these lines below are correct,
 // and then change the floor, room, and OTA hostname in Secrets.h, the topic is built off those.
 
 // -----===== Begin Config Block =====-----
-int deviceIsRelay = 1;
-int deviceIsComputer = 0;
+int deviceIsRelay = 0;
+int deviceIsComputer = 1;
 int deviceIsInfrared = 0;
-#define STARTUP_DELAY_SECONDS 10  // Number of seconds on power applied before device actually turns on. For power outages, restarts, etc...
 // -----===== End Config Block =====-----
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
 unsigned long OTAUntilMillis = 0;
 unsigned long now = 0;
-long lastMsg = 0;
+unsigned long computerPowerOffByTimeout = 0;
+
 char msg[150];
 char DEVICE_TOPIC[150];
+
 int delayTime = STARTUP_DELAY_SECONDS * SECONDS;
 int value = 0;
 int curQueryStat = 0;
-int OTAReadyFlag = 0;
 int curState = 0;
-int startup_flag = 0;
+
+int OTAReadyFlag = 0;
+int startupFlag = 0;
 int initMsgFlag = 0;
+int computerPowerOffCheckingFlag = 0;
+int computerNeedsToTurnBackOnFlag = 0;
 
 void setup(void) {
   pinMode (D1, OUTPUT);
@@ -63,7 +68,7 @@ void loop(void) {
   }
 
   // To prevent device damage from starting back up too quickly after a power outage, reset, etc...
-  if (!startup_flag && now > delayTime) {
+  if (!startupFlag && now > delayTime) {
     if (deviceIsComputer) {
       powerOnComputer();
     }
@@ -71,7 +76,35 @@ void loop(void) {
       powerOnRelay();
     }
   }
-  
+
+  // This block gives computer exhibits a two minute timeout and hard-resets them if they're frozen
+  if (computerPowerOffCheckingFlag) {
+    int curState = analogRead(A0);
+    if (curState < 900) {
+      // If computer turned off within the timeout
+      computerPowerOffCheckingFlag = 0;
+
+      if (computerNeedsToTurnBackOnFlag){
+      // Then these two lines make it do the auto startup after delay in the main loop.
+      delayTime = STARTUP_DELAY_SECONDS * SECONDS + now;
+      startupFlag = 0;
+      computerNeedsToTurnBackOnFlag = 0;
+      }
+    }
+
+    if (now > computerPowerOffByTimeout) {
+      hardPowerOffComputer();
+            
+      // Then these two lines make it do the auto startup after delay in the main loop.
+      delayTime = STARTUP_DELAY_SECONDS * SECONDS + now;
+      startupFlag = 0;
+      computerPowerOffCheckingFlag = 0;
+    }
+  }
+
   snprintf (msg, 150, "%s's ESP8266 is now up. Device starting after startup delay of %ld seconds.", OTA_HOSTNAME, STARTUP_DELAY_SECONDS);
-  if (!initMsgFlag){client.publish(DEVICE_TOPIC, msg); initMsgFlag = 1;}
+  if (!initMsgFlag) {
+    client.publish(DEVICE_TOPIC, msg);
+    initMsgFlag = 1;
+  }
 }
