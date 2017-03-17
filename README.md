@@ -49,8 +49,7 @@ startOTA sets up the ESP to be programmable OTA for five minutes. Note that if y
 
 powerReset power-cycles the exhibit, leaving it off for whatever startup delay time was specified in the main arduino sketch
 
-
-
+```
 Code is released under the following license:
 
 Copyright (c) 2017 Orlando Science Center
@@ -72,3 +71,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
