@@ -48,3 +48,26 @@ Most of these should be self-explanatory, getStatus returns 1 if on, 0 if the de
 startOTA sets up the ESP to be programmable OTA for five minutes. Note that if you start OTA but don't program it within the 5 minute timeout, the hostname will persist in your ports menu in the arduino IDE until you reset the ESP. This is good for keeping clutter in your ports menu down.
 
 powerReset power-cycles the exhibit, leaving it off for whatever startup delay time was specified in the main arduino sketch
+
+
+Code is released under the following license:
+
+Copyright (c) 2017 Orlando Science Center
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
