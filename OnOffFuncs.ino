@@ -1,7 +1,7 @@
 void powerOnComputer() {
   int curState = analogRead(A0);
   if (curState > 900) {
-    client.publish(DEVICE_TOPIC, "Error: Device already on, cannot turn on.");
+    client.publish(TOPIC_T, "Error: Device already on");
     startupFlag = 1;
   } else {
     pinMode (D5, OUTPUT);
@@ -9,7 +9,7 @@ void powerOnComputer() {
     delay(200);
     digitalWrite(D5, HIGH);
     pinMode (D5, INPUT);
-    client.publish(DEVICE_TOPIC, "Success: Device turning on now.");
+    client.publish(TOPIC_T, "Starting");
     startupFlag = 1;
   }
 }
@@ -22,10 +22,10 @@ void powerOffComputer() {
     delay(200);
     digitalWrite(D5, HIGH);
     pinMode (D5, INPUT);
-    client.publish(DEVICE_TOPIC, "Success: Device turning off now.");
+    client.publish(TOPIC_T, "Turning off");
     startupFlag = 1;
   } else {
-    client.publish(DEVICE_TOPIC, "Error: Device already off, cannot turn off.");
+    client.publish(TOPIC_T, "Error: Device already off");
     startupFlag = 1;
   }
 }
@@ -38,10 +38,10 @@ void hardPowerOffComputer() {
     delay(7000);
     digitalWrite(D5, HIGH);
     pinMode (D5, INPUT);
-    client.publish(DEVICE_TOPIC, "Error: Device had to be hard powered off.");
+    client.publish(TOPIC_T, "CritErr: Device forced off");
     startupFlag = 1;
   } else {
-    client.publish(DEVICE_TOPIC, "Error: Device already off, cannot turn off.");
+    client.publish(TOPIC_T, "Error: Device already off");
     startupFlag = 1;
   }
 }
@@ -50,10 +50,10 @@ void powerOnRelay() {
   if (curState == 0) {
     digitalWrite(D1, HIGH);
     curState = 1;
-    client.publish(DEVICE_TOPIC, "Success: Device turning on now.");
+    client.publish(TOPIC_T, "Starting");
     startupFlag = 1;
   } else {
-    client.publish(DEVICE_TOPIC, "Error: Device already on, cannot turn on.");
+    client.publish(TOPIC_T, "Error: Device already on");
     startupFlag = 1;
   }
 }
@@ -62,10 +62,38 @@ void powerOffRelay() {
   if (curState == 1) {
     digitalWrite(D1, LOW);
     curState = 0;
-    client.publish(DEVICE_TOPIC, "Success: Device turning off now.");
+    client.publish(TOPIC_T, "Turning off");
     startupFlag = 1;
   } else {
-    client.publish(DEVICE_TOPIC, "Error: Device already off, cannot turn off.");
+    client.publish(TOPIC_T, "Error: Device already off");
+    startupFlag = 1;
+  }
+}
+
+void powerOffInfrared(){
+  if (curState) {
+    irsend.send_raw("NEC", 0xCC0000FF, 32);
+    delay(1000);
+    irsend.send_raw("NEC", 0xCC0000FF, 32);
+    delay(1000);
+    client.publish(TOPIC_T, "Turning off");  
+    startupFlag = 1;
+  } else {
+    client.publish(TOPIC_T, "Error: Device already off");
+    startupFlag = 1;
+  }
+}
+
+void powerOnInfrared(){
+  if (!curState) {
+    irsend.send_raw("NEC", 0xCC0000FF, 32);
+    delay(1000);
+    irsend.send_raw("NEC", 0xCC0000FF, 32);
+    delay(1000);
+    client.publish(TOPIC_T, "Starting");  
+    startupFlag = 1;
+  } else {
+    client.publish(TOPIC_T, "Error: Device already on");
     startupFlag = 1;
   }
 }

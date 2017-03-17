@@ -2,21 +2,23 @@ extern unsigned long OTAUntilMillis;
 extern unsigned long now;
 extern unsigned long computerPowerOffTimeout;
 
-extern char msg[150];
+extern char msg[50];
 
 extern int value;
 extern int curQueryStat;
-extern int OTAReadyFlag;
-extern int startupFlag;
-extern int computerPowerOffCheckingFlag;
-extern int computerNeedsToTurnBackOnFlag;
+
+extern bool OTARdyFlag;
+extern bool startupFlag;
+extern bool computerPowerOffCheckingFlag;
+extern bool computerNeedsToTurnBackOnFlag;
 
 void callback(char* topic, byte* payload, unsigned int length) {
   String payloadStr = "";
-  Serial.print("Message arrived [");
+  Serial.print(F("Message arrived ["));
   Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++) {
+  Serial.print(F("] "));
+  
+  for (unsigned int i = 0; i < length; i++) {
     payloadStr += ((char)payload[i]);
   }
 
@@ -25,7 +27,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // powerOff, powerOn, getStatus, startOTA, powerReset, resetESP
 
   // powerOff
-  if (payloadStr.equals("powerOff")) {
+  if (payloadStr.equals(F("powerOff"))) {
     digitalWrite(BUILTIN_LED, HIGH);   // Turn the LED off (HIGH is off)
     if (deviceIsRelay) {
       powerOffRelay();
@@ -37,9 +39,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
       computerPowerOffCheckingFlag = 1;
       computerNeedsToTurnBackOnFlag = 0;
     }
+    if(deviceIsInfrared){
+      powerOffInfrared();
+    }
 
     // powerOn
-  } else if (payloadStr.equals("powerOn")) {
+  } else if (payloadStr.equals(F("powerOn"))) {
     digitalWrite(BUILTIN_LED, LOW);  // Turn the LED on
     if (deviceIsRelay) {
       powerOnRelay();
@@ -47,9 +52,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (deviceIsComputer) {
       powerOnComputer();
     }
+    if(deviceIsInfrared){
+      powerOnInfrared();
+    }
 
     // getStatus
-  } else if (payloadStr.equals("getStatus")) {
+  } else if (payloadStr.equals(F("getStatus"))) {
     if (deviceIsComputer) {
       if (analogRead(A0) > 900) {
         curQueryStat = 1;
@@ -57,21 +65,25 @@ void callback(char* topic, byte* payload, unsigned int length) {
         curQueryStat = 0;
       }
       snprintf (msg, 20, "PowerState: %i", curQueryStat);
-      client.publish(DEVICE_TOPIC, msg);
+      client.publish(TOPIC_T, msg);
     }
     if (deviceIsRelay) {
       snprintf (msg, 20, "PowerState: %i", curState);
-      client.publish(DEVICE_TOPIC, msg);
+      client.publish(TOPIC_T, msg);
+    }
+    if(deviceIsInfrared){
+      snprintf (msg, 20, "PowerState: %i", curState);
+      client.publish(TOPIC_T, msg);
     }
 
     // startOTA
-  } else if (payloadStr.equals("startOTA")) {
-    client.publish(DEVICE_TOPIC, "Device is now OTA Programmable for the next 5 minutes");
+  } else if (payloadStr.equals(F("startOTA"))) {
+    client.publish(TOPIC_T, "OTA for 5m");
     OTAUntilMillis = now + 300 * SECONDS; // 5 minutes
 
     // powerReset
-  } else if (payloadStr.equals("powerReset")) {
-    client.publish(DEVICE_TOPIC, "Device is now power-cycling whatever is attached.");
+  } else if (payloadStr.equals(F("powerReset"))) {
+    client.publish(TOPIC_T, "Power-cycling.");
     delay(500);
 
     if (deviceIsRelay) {
@@ -90,8 +102,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     
     // resetESP
-  } else if (payloadStr.equals("resetESP")) {
-    client.publish(DEVICE_TOPIC, "Device is now resetting the ESP8266");
+  } else if (payloadStr.equals(F("resetESP"))) {
+    client.publish(TOPIC_T, "ESP8266 resetting");
     delay(500);
     ESP.restart();
   }
@@ -100,21 +112,21 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+    Serial.print(F("Attempting MQTT connection..."));
     // Create a random client ID
-    String clientId = "ESP8266Client-";
+    String clientId = F("ESPCli-");
     clientId += String(random(0xffff), HEX);
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
-      Serial.println("connected");
+      Serial.println(F("connected"));
       // Once connected, publish an announcement...
-      // client.publish("outTopic", "hello world");
+      client.publish(TOPIC_T, "hello world");
       // ... and resubscribe
-      client.subscribe(DEVICE_TOPIC);
+      client.subscribe(TOPIC_T);
     } else {
-      Serial.print("failed, rc=");
+      Serial.print(F("failed, rc="));
       Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      Serial.println(F(" try again in 5 seconds"));
       // Wait 5 seconds before retrying
       delay(5000);
     }

@@ -1,22 +1,13 @@
 void wifiSetupOTA(){
   ArduinoOTA.setHostname(OTA_HOSTNAME);
  
-  ArduinoOTA.onStart([]() {
-    //debugOut.println("Start");
-  });
-  ArduinoOTA.onEnd([]() {
-    //debugOut.println("\nEnd");
-  });
+  ArduinoOTA.onStart([]() {});
+  ArduinoOTA.onEnd([]() {});
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    Serial.print(F("Err"));
   });
   ArduinoOTA.begin();
 }
@@ -24,17 +15,17 @@ void wifiSetupOTA(){
 void wifiSetup(){
   WiFi.mode(WIFI_STA);
   Serial.println();
-  Serial.print("Connecting to ");
+  Serial.print(F("Connecting to "));
   Serial.println(ssid);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Serial.print(F("."));
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
+  Serial.println();
+  Serial.println(F("WiFi connected"));
+  Serial.println(F("IP address: "));
   Serial.println(WiFi.localIP());
 }
