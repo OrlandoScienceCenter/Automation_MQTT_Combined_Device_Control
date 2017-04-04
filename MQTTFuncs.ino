@@ -41,6 +41,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     if(deviceIsInfrared){
       powerOffInfrared();
+
+      infraredPowerOffByTimeout = now + (45 * SECONDS);
+      infraredPowerOffCheckingFlag = 1;
     }
 
     // powerOn
@@ -66,13 +69,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
       }
       snprintf (msg, 20, "PowerState: %i", curQueryStat);
       client.publish(TOPIC_T, msg);
+      snprintf (msg, 30, "Up for: %i seconds", now / 1000);
+      client.publish(TOPIC_T, msg);
     }
     if (deviceIsRelay) {
       snprintf (msg, 20, "PowerState: %i", curState);
       client.publish(TOPIC_T, msg);
+      snprintf (msg, 30, "Up for: %i seconds", now / 1000);
+      client.publish(TOPIC_T, msg);
     }
     if(deviceIsInfrared){
       snprintf (msg, 20, "PowerState: %i", curState);
+      client.publish(TOPIC_T, msg);
+      snprintf (msg, 30, "Up for: %i seconds", now / 1000);
       client.publish(TOPIC_T, msg);
     }
 
@@ -119,9 +128,7 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
       Serial.println(F("connected"));
-      // Once connected, publish an announcement...
-      client.publish(TOPIC_T, "hello world");
-      // ... and resubscribe
+      // And resubscribe
       client.subscribe(TOPIC_T);
     } else {
       Serial.print(F("failed, rc="));

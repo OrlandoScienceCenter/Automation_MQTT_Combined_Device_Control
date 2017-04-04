@@ -1,14 +1,14 @@
 void powerOnComputer() {
   int curState = analogRead(A0);
   if (curState > 900) {
-    client.publish(TOPIC_T, "Error: Device already on");
+    client.publish(TOPIC_T, "Warning: Device already on");
     startupFlag = 1;
   } else {
-    pinMode (D5, OUTPUT);
-    digitalWrite(D5, LOW);
+    pinMode (COMPUTER_SWITCHSENSEPIN, OUTPUT);
+    digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);
     delay(200);
-    digitalWrite(D5, HIGH);
-    pinMode (D5, INPUT);
+    digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);
+    pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);
     client.publish(TOPIC_T, "Starting");
     startupFlag = 1;
   }
@@ -17,15 +17,15 @@ void powerOnComputer() {
 void powerOffComputer() {
   int curState = analogRead(A0);
   if (curState > 900) {
-    pinMode (D5, OUTPUT);
-    digitalWrite(D5, LOW);
+    pinMode (COMPUTER_SWITCHSENSEPIN, OUTPUT);
+    digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);
     delay(200);
-    digitalWrite(D5, HIGH);
-    pinMode (D5, INPUT);
+    digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);
+    pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);
     client.publish(TOPIC_T, "Turning off");
     startupFlag = 1;
   } else {
-    client.publish(TOPIC_T, "Error: Device already off");
+    client.publish(TOPIC_T, "Warning: Device already off");
     startupFlag = 1;
   }
 }
@@ -33,39 +33,39 @@ void powerOffComputer() {
 void hardPowerOffComputer() {
   int curState = analogRead(A0);
   if (curState > 900) {
-    pinMode (D5, OUTPUT);
-    digitalWrite(D5, LOW);
+    pinMode (COMPUTER_SWITCHSENSEPIN, OUTPUT);
+    digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);
     delay(7000);
-    digitalWrite(D5, HIGH);
-    pinMode (D5, INPUT);
+    digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);
+    pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);
     client.publish(TOPIC_T, "CritErr: Device forced off");
     startupFlag = 1;
   } else {
-    client.publish(TOPIC_T, "Error: Device already off");
+    client.publish(TOPIC_T, "Warning: Device already off");
     startupFlag = 1;
   }
 }
 
 void powerOnRelay() {
   if (curState == 0) {
-    digitalWrite(D1, HIGH);
+    digitalWrite(RELAY_POSPIN, HIGH);
     curState = 1;
     client.publish(TOPIC_T, "Starting");
     startupFlag = 1;
   } else {
-    client.publish(TOPIC_T, "Error: Device already on");
+    client.publish(TOPIC_T, "Warning: Device already on");
     startupFlag = 1;
   }
 }
 
 void powerOffRelay() {
   if (curState == 1) {
-    digitalWrite(D1, LOW);
+    digitalWrite(RELAY_POSPIN, LOW);
     curState = 0;
     client.publish(TOPIC_T, "Turning off");
     startupFlag = 1;
   } else {
-    client.publish(TOPIC_T, "Error: Device already off");
+    client.publish(TOPIC_T, "Warning: Device already off");
     startupFlag = 1;
   }
 }
@@ -79,7 +79,7 @@ void powerOffInfrared(){
     client.publish(TOPIC_T, "Turning off");  
     startupFlag = 1;
   } else {
-    client.publish(TOPIC_T, "Error: Device already off");
+    client.publish(TOPIC_T, "Warning: Device already off");
     startupFlag = 1;
   }
 }
@@ -93,7 +93,7 @@ void powerOnInfrared(){
     client.publish(TOPIC_T, "Starting");  
     startupFlag = 1;
   } else {
-    client.publish(TOPIC_T, "Error: Device already on");
+    client.publish(TOPIC_T, "Warning: Device already on");
     startupFlag = 1;
   }
 }

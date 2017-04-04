@@ -4,7 +4,13 @@
 #include <PubSubClient.h>
 #include <IRremoteESP8266.h>
 #include "Secrets.h"
+
 #define SECONDS 1000
+
+// Pin assignments
+#define INFRARED_LEDPIN D2          // Runs to the + leg of the IR LED
+#define RELAY_POSPIN D1             // Runs to the control + pin on the relay
+#define COMPUTER_SWITCHSENSEPIN D5  // Runs to the wire attached to the computer power switch that isn't GND
 
 // To change this code for a new device, make sure these lines below are correct,
 // and then change the topic and OTA Hostname in Secrets.h
@@ -21,11 +27,12 @@ bool startupFlag = 1; // Set this to 0 if you want exhibit to start up on power 
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-IRsend irsend(D2); //an IR led is connected with the + leg on D2
+IRsend irsend(INFRARED_LEDPIN); //an IR led is connected with the + leg on INFRARED_LEDPIN
 
   unsigned long OTAUntilMillis = 0;
   unsigned long now = 0;
   unsigned long computerPowerOffByTimeout = 0;
+  unsigned long infraredPowerOffByTimeout = 0;
   
   char msg[50];
 
@@ -40,14 +47,15 @@ IRsend irsend(D2); //an IR led is connected with the + leg on D2
   bool initMsgFlag = 0;
   bool computerPowerOffCheckingFlag = 0;
   bool computerNeedsToTurnBackOnFlag = 0;
+  bool infraredPowerOffCheckingFlag = 0;
 
 void setup(void) {
   pinMode (A0, INPUT);
-  pinMode (D1, OUTPUT);
-  pinMode (D2, OUTPUT);
-  pinMode (D5, INPUT);
+  pinMode (RELAY_POSPIN, OUTPUT);
+  pinMode (INFRARED_LEDPIN, OUTPUT);
+  pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);
  
-  digitalWrite(D1, LOW);
+  digitalWrite(RELAY_POSPIN, LOW);
 
   Serial.begin(115200);
 
@@ -74,6 +82,7 @@ void loop(void) {
 
     delay(2);  // No clue why, but it's unstable without this. Gives RC=-2 MQTT disconnect errors. Just fine with it. It's related to analogRead
     curState = analogRead(A0);   
+
     curState = map(curState, 506, 411, 0, 1024);
     if (curState > 512){if (infraredTimeoutCtr < 5000){infraredTimeoutCtr+=50;}} else {if (infraredTimeoutCtr > 0){infraredTimeoutCtr--;}}
     
@@ -85,9 +94,13 @@ void loop(void) {
 
     // If state changed
     if (lastCurState != curState){ 
-        snprintf (msg, 49, "Warning: PowerState Changed, is now: %i", curState);
-        client.publish(TOPIC_T, msg);
-
+        if (curState == 0){                                  // If device turned off
+           if (infraredPowerOffByTimeout <= now) {           // and the timeout is in the past (meaning we didn't set the timeout, meaning we didn't send a MQTT poweroff command.)
+            snprintf (msg, 49, "CritErr: Device turned off unexpectedly", curState);
+            client.publish(TOPIC_T, msg);
+          }
+        }
+        
         lastCurState = curState; 
       }
   }
@@ -138,7 +151,19 @@ void loop(void) {
     }
   }
 
-  snprintf (msg, 150, "%s's ESP8266 is up", OTA_HOSTNAME);
+  if (infraredPowerOffCheckingFlag) {
+    if (curState == 0) {
+      // If device turned off within the timeout
+      infraredPowerOffCheckingFlag = 0;
+    }
+
+    if (now > infraredPowerOffByTimeout) {
+      client.publish(TOPIC_T, "CritErr: Device did not turn off within timeout");
+      infraredPowerOffCheckingFlag = 0;
+    }
+  }
+
+  snprintf (msg, 150, "%s's ESP8266 is up and subscribed", OTA_HOSTNAME);
   if (!initMsgFlag) {
     client.publish(TOPIC_T, msg);
     initMsgFlag = 1;
