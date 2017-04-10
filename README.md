@@ -2,7 +2,7 @@ Generic MQTT IOT device code for ESP8266
 
 Dependencies:
 https://github.com/marcosamarinho/IRremoteESP8266
-
+https://github.com/knolleary/pubsubclient
 
 This code is meant to control the following:
 
