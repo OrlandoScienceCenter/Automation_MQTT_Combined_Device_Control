@@ -30,7 +30,7 @@ void wifiSetup(){
   Serial.println(WiFi.localIP());
 }
 
-String wifiSearch(char searchname[]) {
+String wifiSearch(char searchname[], char exclude[]) {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(1000);
@@ -51,7 +51,7 @@ String wifiSearch(char searchname[]) {
       int str_len = str.length() + 1;
       char char_array[str_len];
       str.toCharArray(char_array,str_len);
-      if(strncmp(char_array,searchname,sizeof(searchname)-1)==0){
+      if(strncmp(char_array,searchname,sizeof(searchname)-1)==0 && !strncmp(char_array,exclude,sizeof(exclude)-1)==0){
         wifiNames[curArrayLoc] = str;
         wifiStrengths[curArrayLoc] = WiFi.RSSI(i);
         curArrayLoc++;
