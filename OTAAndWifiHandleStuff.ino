@@ -13,7 +13,7 @@ void wifiSetupOTA(){
 }
 
 void wifiSetup(){
-  const char * ssid = wifiSearch(wifiScanTag).c_str();
+  const char * ssid = wifiSearch(wifiScanTag,wifiExclude).c_str();
   Serial.println();
   Serial.print(F("Connecting to "));
   Serial.println(ssid);
