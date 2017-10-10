@@ -5,6 +5,7 @@
 #define STARTUP_DELAY_SECONDS 900
 
 #define wifiScanTag "____ScanTag____"
+#define wifiExclude "____UnwantedSSID____"
 #define password "__wlan-password__"
 #define mqtt_server "__MQTT-server-ip__"
 
