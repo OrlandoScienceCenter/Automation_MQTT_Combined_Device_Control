@@ -24,7 +24,7 @@ int deviceIsRelay = 0;
 int deviceIsComputer = 0;
 int deviceIsInfrared = 1;
 
-bool startupFlag = 1; // Set this to 0 if you want exhibit to start up on power applied/after a brownout
+bool startupFlag = 0; // Set this to 0 if you want exhibit to start up on power applied/after a brownout
 // -----===== End Config Block =====-----
 
 WiFiClient espClient;
@@ -49,6 +49,7 @@ ESP8266WiFiMulti wifiMulti;
   bool OTARdyFlag = 0;
   bool initMsgFlag = 0;
   bool computerPowerOffCheckingFlag = 0;
+  bool wifiStillNeedsToConnect = 1;
   bool computerNeedsToTurnBackOnFlag = 0;
   bool infraredPowerOffCheckingFlag = 0;
 
@@ -73,10 +74,12 @@ void setup(void) {
 void loop(void) {
   now = millis();
 
-  if (!client.connected()) {
-    reconnect();
+  if (!wifiStillNeedsToConnect){
+    if (!client.connected()) {
+      reconnect();
+    }
+    client.loop();  
   }
-  client.loop();
 
   if(deviceIsInfrared){
     // This is all just to increment a counter if it reads a device that's on and decrement it if it's not seeing anything
@@ -171,4 +174,6 @@ void loop(void) {
     client.publish(TOPIC_T, msg);
     initMsgFlag = 1;
   }
+
+  if (wifiStillNeedsToConnect){wifiSetup();}
 }
