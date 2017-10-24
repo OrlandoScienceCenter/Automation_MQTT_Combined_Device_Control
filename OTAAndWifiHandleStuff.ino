@@ -13,68 +13,22 @@ void wifiSetupOTA(){
 }
 
 void wifiSetup(){
-  const char * ssid = wifiSearch(wifiScanTag,wifiExclude).c_str();
   Serial.println();
-  Serial.print(F("Connecting to "));
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
+  Serial.print("Connecting");
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(F("."));
+  wifiMulti.addAP(WIFI_1, WIFI_PSK);
+  wifiMulti.addAP(WIFI_2, WIFI_PSK);
+  wifiMulti.addAP(WIFI_3, WIFI_PSK);
+  wifiMulti.addAP(WIFI_4, WIFI_PSK);
+  
+  int i = 0;
+  while (wifiMulti.run() != WL_CONNECTED) { // Wait for the Wi-Fi to connect: scan for Wi-Fi networks, and connect to the strongest of the networks above
+    delay(1000);
+    Serial.print('.');
   }
 
-  Serial.println();
-  Serial.println(F("WiFi connected"));
-  Serial.println(F("IP address: "));
-  Serial.println(WiFi.localIP());
-}
-
-String wifiSearch(char searchname[], char exclude[]) {
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(1000);
-  Serial.println("scan start");
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0) {
-    Serial.println("no networks found");
-    return("ERROR: NO NETWORKS FOUND");
-  }
-  else
-  {
-    int curArrayLoc = 0;
-    String  wifiNames[10];
-    int wifiStrengths[10];
-    for (int i = 0; i < n; ++i) {
-      String str = WiFi.SSID(i);
-      int str_len = str.length() + 1;
-      char char_array[str_len];
-      str.toCharArray(char_array,str_len);
-      if(strncmp(char_array,searchname,sizeof(searchname)-1)==0 && !strncmp(char_array,exclude,sizeof(exclude)-1)==0){
-        wifiNames[curArrayLoc] = str;
-        wifiStrengths[curArrayLoc] = WiFi.RSSI(i);
-        curArrayLoc++;
-      }
-    }
-    Serial.println("Valid networks found");
-    int maxRSSI = -1000;
-    int maxLoc = -1;
-    for (int i = 0; i < curArrayLoc; ++i){
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(wifiNames[i]);
-      Serial.print(" (");
-      Serial.print(wifiStrengths[i]);
-      Serial.println(")dB");
-      if(wifiStrengths[i] > maxRSSI) {
-        maxLoc = i;
-        maxRSSI = wifiStrengths[i];
-      }
-      delay(10);
-    }
-    Serial.print("STRONGEST WIFI IS: ");
-    Serial.println(wifiNames[maxLoc]);
-    return(wifiNames[maxLoc]);
-  }
+  Serial.print("Connected to ");
+  Serial.println(WiFi.SSID());              // Tell us what network we're connected to
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());           // Send the IP address of the ESP8266 to the computer
 }

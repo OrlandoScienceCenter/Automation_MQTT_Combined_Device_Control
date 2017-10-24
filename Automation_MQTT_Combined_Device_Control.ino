@@ -1,8 +1,10 @@
+#include <ESP8266WiFiMulti.h>
+#include <IRremoteESP8266.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ArduinoOTA.h>
 #include <PubSubClient.h>
-#include <IRremoteESP8266.h>
+#include <IRsend.h>
 #include "Secrets.h"
 
 #define SECONDS 1000
@@ -28,6 +30,7 @@ bool startupFlag = 1; // Set this to 0 if you want exhibit to start up on power 
 WiFiClient espClient;
 PubSubClient client(espClient);
 IRsend irsend(INFRARED_LEDPIN); //an IR led is connected with the + leg on INFRARED_LEDPIN
+ESP8266WiFiMulti wifiMulti;  
 
   unsigned long OTAUntilMillis = 0;
   unsigned long now = 0;

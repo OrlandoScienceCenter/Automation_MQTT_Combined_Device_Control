@@ -63,27 +63,26 @@ void callback(char* topic, byte* payload, unsigned int length) {
   } else if (payloadStr.equals(F("getStatus"))) {
     if (deviceIsComputer) {
       if (analogRead(A0) > 900) {
-        curQueryStat = 1;
+        curState = 1;
       } else {
-        curQueryStat = 0;
+        curState = 0;
       }
-      snprintf (msg, 20, "PowerState: %i", curQueryStat);
-      client.publish(TOPIC_T, msg);
-      snprintf (msg, 30, "Up for: %i seconds", now / 1000);
-      client.publish(TOPIC_T, msg);
     }
     if (deviceIsRelay) {
-      snprintf (msg, 20, "PowerState: %i", curState);
-      client.publish(TOPIC_T, msg);
-      snprintf (msg, 30, "Up for: %i seconds", now / 1000);
-      client.publish(TOPIC_T, msg);
+      
     }
     if(deviceIsInfrared){
-      snprintf (msg, 20, "PowerState: %i", curState);
-      client.publish(TOPIC_T, msg);
-      snprintf (msg, 30, "Up for: %i seconds", now / 1000);
-      client.publish(TOPIC_T, msg);
+      
     }
+
+    // These get sent no matter what device type is
+    snprintf (msg, 20, "PowerState: %i", curState);
+    client.publish(TOPIC_T, msg);
+    snprintf (msg, 30, "Up for: %i seconds", now / 1000);
+    client.publish(TOPIC_T, msg);
+    IPAddress myIP = WiFi.localIP();
+    snprintf (msg, 30, "My IP is: %i.%i.%i.%i", myIP[0], myIP[1], myIP[2], myIP[3]);
+    client.publish(TOPIC_T, msg);
 
     // startOTA
   } else if (payloadStr.equals(F("startOTA"))) {

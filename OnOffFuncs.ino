@@ -72,10 +72,7 @@ void powerOffRelay() {
 
 void powerOffInfrared(){
   if (curState) {
-    irsend.send_raw("NEC", 0xCC0000FF, 32);
-    delay(1000);
-    irsend.send_raw("NEC", 0xCC0000FF, 32);
-    delay(1000);
+    if (OTA_HOSTNAME == "ARSandboxProjector"){ARSandIROff();}
     client.publish(TOPIC_T, "Turning off");  
     startupFlag = 1;
   } else {
@@ -86,10 +83,7 @@ void powerOffInfrared(){
 
 void powerOnInfrared(){
   if (!curState) {
-    irsend.send_raw("NEC", 0xCC0000FF, 32);
-    delay(1000);
-    irsend.send_raw("NEC", 0xCC0000FF, 32);
-    delay(1000);
+    if (OTA_HOSTNAME == "ARSandboxProjector"){ARSandIROn();}
     client.publish(TOPIC_T, "Starting");  
     startupFlag = 1;
   } else {
@@ -97,3 +91,18 @@ void powerOnInfrared(){
     startupFlag = 1;
   }
 }
+
+// OSC Specific IR codes:
+// -----===== Begin AR Sandbox BenQ Projector =====-----
+void ARSandIROff(){
+  irsend.sendNEC(0xC728D, 32);
+  delay(1000);
+  irsend.sendNEC(0xC728D, 32);
+  delay(2000);
+}
+
+void ARSandIROn(){
+  irsend.sendNEC(0xCF20D, 32);
+  delay(2000);
+}
+// -----===== End AR Sandbox BenQ Projector =====-----

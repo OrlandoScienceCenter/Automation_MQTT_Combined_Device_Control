@@ -1,14 +1,15 @@
-#define TOPIC_T "__full-MQTT-topic__"
-#define OTA_HOSTNAME "__OTA-hostname__"
+#define TOPIC_T "Topic/Goes/Here/NameForDevice"
+#define OTA_HOSTNAME "NameForDevice"
 
 // Number of seconds on power applied before device actually turns on. For power outages, restarts, etc...
 #define STARTUP_DELAY_SECONDS 900
 
-#define wifiScanTag "____ScanTag____"
-#define wifiExclude "____UnwantedSSID____"
-#define password "__wlan-password__"
-#define mqtt_server "__MQTT-server-ip__"
+#define mqtt_server "my.mqttserver.com"
 
-uint16_t onData[__length-of-array__] = {__raw-ir-data-comma-separated-unsigned__};
+// If you have more or fewer than four Wi-Fi networks, you'll need to change the number in OTAAndWifiHandleStuff.ino
+#define WIFI_1 "SSID Name for first network"
+#define WIFI_2 "SSID Name for second network"
+#define WIFI_3 "And so on"
+#define WIFI_4 "And so forth"
 
-uint16_t offData[__length-of-array__] = {__raw-ir-data-comma-separated-unsigned__};
+#define WIFI_PSK "yourWiFiPassword"

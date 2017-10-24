@@ -31,15 +31,21 @@ Pins:
 To get started, add a file called Secrets.h to your sketch directory. It should look like:
 
 ```
-#define TOPIC_T "Topic/Goes/Here/DeviceName"
-#define OTA_HOSTNAME "Name_for_OTA_and_Such"
+#define TOPIC_T "Topic/Goes/Here/NameForDevice"
+#define OTA_HOSTNAME "NameForDevice"
 
 // Number of seconds on power applied before device actually turns on. For power outages, restarts, etc...
-#define STARTUP_DELAY_SECONDS 30
+#define STARTUP_DELAY_SECONDS 900
 
-#define ssid "Your_Wifi_SSID"
-#define password "Your_Wifi_PSK"
-#define mqtt_server "my.mqttserver.com" // Or whatever
+#define mqtt_server "my.mqttserver.com"
+
+// If you have more or fewer than four Wi-Fi networks, you'll need to change the number in OTAAndWifiHandleStuff.ino
+#define WIFI_1 "SSID Name for first network"
+#define WIFI_2 "SSID Name for second network"
+#define WIFI_3 "And so on"
+#define WIFI_4 "And so forth"
+
+#define WIFI_PSK "yourWiFiPassword"
 ```
 
 And that's it. Set what device type you want to control via the global variables in the main sketch file and configure a delay time on startup.
