@@ -20,9 +20,9 @@
 // If your device is doing infrared emulation, you'll also need to change the on/off infrared codes in OnOffFuncs
 
 // -----===== Begin Config Block =====-----
-int deviceIsRelay = 0;
+int deviceIsRelay = 1;
 int deviceIsComputer = 0;
-int deviceIsInfrared = 1;
+int deviceIsInfrared = 0;
 
 bool startupFlag = 0; // Set this to 0 if you want exhibit to start up on power applied/after a brownout
 // -----===== End Config Block =====-----
