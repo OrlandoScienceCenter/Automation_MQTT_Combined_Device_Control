@@ -5,10 +5,15 @@ void powerOnComputer() {
     startupFlag = 1;
   } else {
     pinMode (COMPUTER_SWITCHSENSEPIN, OUTPUT);
-    digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);
+
+    if (computerButtonStateReversed){digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);} else {digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);}
+
     delay(200);
-    digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);
-    pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);
+    
+    if (computerButtonStateReversed){digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);} else {digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);}
+    
+    if (!computerButtonStateReversed){pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);} // For KZ Sims keeps driving relay low
+    
     client.publish(TOPIC_T, "Starting");
     startupFlag = 1;
   }
@@ -18,10 +23,15 @@ void powerOffComputer() {
   int curState = analogRead(A0);
   if (curState > 900) {
     pinMode (COMPUTER_SWITCHSENSEPIN, OUTPUT);
-    digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);
+    
+    if (computerButtonStateReversed){digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);} else {digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);}
+    
     delay(200);
-    digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);
-    pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);
+    
+    if (computerButtonStateReversed){digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);} else {digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);}
+    
+    if (!computerButtonStateReversed){pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);} // For KZ Sims keeps driving relay low
+    
     client.publish(TOPIC_T, "Turning off");
     startupFlag = 1;
   } else {
@@ -34,10 +44,12 @@ void hardPowerOffComputer() {
   int curState = analogRead(A0);
   if (curState > 900) {
     pinMode (COMPUTER_SWITCHSENSEPIN, OUTPUT);
-    digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);
+    if (computerButtonStateReversed){digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);} else {digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);}
     delay(7000);
-    digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);
-    pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);
+    if (computerButtonStateReversed){digitalWrite(COMPUTER_SWITCHSENSEPIN, LOW);} else {digitalWrite(COMPUTER_SWITCHSENSEPIN, HIGH);}
+    
+    if (!computerButtonStateReversed){pinMode (COMPUTER_SWITCHSENSEPIN, INPUT);} // For KZ Sims keeps driving relay low
+    
     client.publish(TOPIC_T, "CritErr: Device forced off");
     startupFlag = 1;
   } else {
@@ -51,6 +63,7 @@ void powerOnRelay() {
     digitalWrite(RELAY_POSPIN, HIGH);
     curState = 1;
     client.publish(TOPIC_T, "Starting");
+    Serial.println("PowerOnCommandRecieved");
     startupFlag = 1;
   } else {
     client.publish(TOPIC_T, "Warning: Device already on");
@@ -63,6 +76,7 @@ void powerOffRelay() {
     digitalWrite(RELAY_POSPIN, LOW);
     curState = 0;
     client.publish(TOPIC_T, "Turning off");
+    Serial.println("PowerOffCommandRecieved");
     startupFlag = 1;
   } else {
     client.publish(TOPIC_T, "Warning: Device already off");
@@ -72,15 +86,21 @@ void powerOffRelay() {
 
 void powerOffInfrared(){
   if (curState) {
-    if (OTA_HOSTNAME == "ARSandboxProjector"){ARSandIROff();}
-    if (OTA_HOSTNAME == "KTTheaterProjector"){KTTIROff();}
-    if (OTA_HOSTNAME == "WFTVMitsubishiTV"){WFTVMitsubishiTVOff();}
-    if (OTA_HOSTNAME == "SOSProjector1"){SOSIROff();}
-    if (OTA_HOSTNAME == "SOSProjector2"){SOSIROff();}
-    if (OTA_HOSTNAME == "SOSProjector3"){SOSIROff();}
-    if (OTA_HOSTNAME == "SOSProjector4"){SOSIROff();}
-    
     client.publish(TOPIC_T, "Turning off");  
+   
+    if (strcmp(OTA_HOSTNAME, "ARSandboxProjector") == 0){ARSandIROff();}
+    if (strcmp(OTA_HOSTNAME, "KTTheaterProjector") == 0){KTTIROff();}
+    if (strcmp(OTA_HOSTNAME, "WFTVMitsubishiTV") == 0){WFTVMitsubishiTVOff();}
+    if (strcmp(OTA_HOSTNAME, "ScienceLiveProjector") == 0){SLStage2ndFloorViewsonicOff();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector1") == 0){SOSIROff();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector2") == 0){SOSIROff();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector3") == 0){SOSIROff();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector4") == 0){SOSIROff();}
+    if (strcmp(OTA_HOSTNAME, "KZSimOneProjector") == 0){KZSimsProjectorsOff();}
+    if (strcmp(OTA_HOSTNAME, "KZSimTwoProjector") == 0){KZSimsProjectorsOff();}
+    if (strcmp(OTA_HOSTNAME, "KZSimThreeProjector") == 0){KZSimsProjectorsOff();}
+    if (strcmp(OTA_HOSTNAME, "TheraminProjector") == 0){TheraminProjectorOff();}
+    
     startupFlag = 1;
   } else {
     client.publish(TOPIC_T, "Warning: Device already off");
@@ -90,15 +110,21 @@ void powerOffInfrared(){
 
 void powerOnInfrared(){
   if (!curState) {
-    if (OTA_HOSTNAME == "ARSandboxProjector"){ARSandIROn();}
-    if (OTA_HOSTNAME == "KTTheaterProjector"){KTTIROn();}
-    if (OTA_HOSTNAME == "WFTVMitsubishiTV"){WFTVMitsubishiTVOn();}
-    if (OTA_HOSTNAME == "SOSProjector1"){SOSIROn();}
-    if (OTA_HOSTNAME == "SOSProjector2"){SOSIROn();}
-    if (OTA_HOSTNAME == "SOSProjector3"){SOSIROn();}
-    if (OTA_HOSTNAME == "SOSProjector4"){SOSIROn();}
-    
     client.publish(TOPIC_T, "Starting");  
+    
+    if (strcmp(OTA_HOSTNAME, "ARSandboxProjector") == 0){ARSandIROn();}
+    if (strcmp(OTA_HOSTNAME, "KTTheaterProjector") == 0){KTTIROn();}
+    if (strcmp(OTA_HOSTNAME, "WFTVMitsubishiTV") == 0){WFTVMitsubishiTVOn();}
+    if (strcmp(OTA_HOSTNAME, "ScienceLiveProjector") == 0){SLStage2ndFloorViewsonicOn();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector1") == 0){SOSIROn();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector2") == 0){SOSIROn();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector3") == 0){SOSIROn();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjector4") == 0){SOSIROn();}
+    if (strcmp(OTA_HOSTNAME, "TheraminProjector") == 0){TheraminProjectorOn();}
+    if (strcmp(OTA_HOSTNAME, "KZSimOneProjector") == 0){KZSimsProjectorsOn();}
+    if (strcmp(OTA_HOSTNAME, "KZSimTwoProjector") == 0){KZSimsProjectorsOn();}
+    if (strcmp(OTA_HOSTNAME, "KZSimThreeProjector") == 0){KZSimsProjectorsOn();}
+    
     startupFlag = 1;
   } else {
     client.publish(TOPIC_T, "Warning: Device already on");
@@ -163,3 +189,51 @@ void SOSIROn(){
   delay(1000);
 }
 // -----===== End SOS Sanyo Proxtra Projectors =====-----
+
+// -----===== Begin Science Live Stage Viewsonic Projector =====-----
+void SLStage2ndFloorViewsonicOff(){
+  irsend.sendNEC(0xC12FE817, 32);
+  delay(1000);
+  irsend.sendNEC(0xC12FE817, 32); 
+}
+
+void SLStage2ndFloorViewsonicOn(){
+   irsend.sendNEC(0xC12FE817, 32);
+}
+// -----===== End Science Live Stage Viewsonic Projector =====-----
+
+// -----===== Begin KZ Sims Projectors =====-----
+void KZSimsProjectorsOn(){
+  irsend.sendNEC(0x4CB340BF, 32);    
+}
+
+void KZSimsProjectorsOff(){
+  irsend.sendNEC(0x4CB3748B, 32);
+  delay(1000);
+  yield();
+  irsend.sendNEC(0x4CB3748B, 32);
+  yield();
+}
+// -----===== End KZ Sims Projectors =====-----
+
+// -----===== Begin STEAM Theramin Projector =====-----
+uint16_t theraminRawPower[239] = {472, 230,  334, 806,  3486, 1720,  446, 446,  412, 1292,  446, 448,  420, 444,  414, 452,  416, 422,  446, 420,  438, 454,  414, 426,  442, 422,  448, 446,  412, 452,  416, 422,  444, 1286,  502, 364,  442, 450,  418, 420,  438, 428,  440, 452,  416, 450,  418, 446,  412, 454,  414, 452,  416, 1288,  440, 452,  416, 450,  418, 448,  410, 1294,  444, 448,  420, 446,  412, 1294,  444, 420,  448, 446,  412, 454,  414, 450,  418, 420,  448, 444,  414, 452,  416, 450,  418, 446,  410, 1294,  444, 448,  420, 1286,  442, 1290,  448, 1284,  442, 1290,  438, 454,  414, 452,  418, 1288,  438, 454,  414, 1290,  448, 446,  412, 1292,  446, 1286,  440, 1292,  498, 1234,  442, 32166,  1066, 40676,  3490, 1716,  440, 452,  418, 1288,  438, 454,  416, 450,  418, 448,  420, 446,  412, 452,  416, 450,  418, 448,  410, 454,  414, 452,  416, 448,  420, 448,  412, 1292,  444, 448,  420, 446,  412, 452,  416, 450,  418, 448,  410, 456,  412, 452,  418, 448,  420, 446,  412, 1292,  444, 422,  448, 444,  414, 452,  416, 1288,  448, 416,  440, 426,  444, 1288,  438, 426,  442, 424,  444, 420,  448, 418,  440, 426,  442, 424,  446, 420,  448, 418,  440, 426,  442, 1288,  438, 428,  440, 1292,  446, 1286,  442, 1290,  448, 1284,  442, 424,  444, 420,  448, 1286,  442, 422,  446, 1286,  442, 426,  444, 1288,  440, 376,  492, 424,  444, 1288,  440, 1292,  446};  // UNKNOWN FD722909
+
+void TheraminProjectorOn(){
+  irsend.sendRaw(theraminRawPower, 239, 38);
+  yield();
+}
+
+void TheraminProjectorOff(){
+  irsend.sendRaw(theraminRawPower, 239, 38);
+  delay(500);
+  yield();
+  irsend.sendRaw(theraminRawPower, 239, 38);
+  delay(500);
+  yield();
+  irsend.sendRaw(theraminRawPower, 239, 38);
+  delay(500);
+  yield();
+}
+
+// -----===== End STEAM Theramin Projector =====-----
