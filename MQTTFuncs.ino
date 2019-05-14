@@ -210,7 +210,13 @@ void reconnect() {
       // Check the OTA report flag
       if (OTAReportFlag == 1){
         OTAReportFlag = 0;
+        
+        yield();
+        ESP.wdtFeed();  
+              
         client.publish(TOPIC_T, "OTA upload done, restarting ESP now.");
+        client.loop();  
+        
         Serial.println(F("OTA Upload done"));
         delay(1000); // Give time to read the serial message.
         ESP.restart();
