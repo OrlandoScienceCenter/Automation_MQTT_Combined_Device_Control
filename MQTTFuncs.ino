@@ -17,6 +17,7 @@ extern bool OTARdyFlag;
 extern bool startupFlag;
 extern bool computerPowerOffCheckingFlag;
 extern bool computerNeedsToTurnBackOnFlag;
+extern bool OTAReportFlag;
 
 void callback(char* topic, byte* payload, unsigned int length) {
   String payloadStr = "";
@@ -129,12 +130,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     if (deviceIsComputer) {
       powerOffComputer();
-      
+
       computerPowerOffByTimeout = now + (120 * SECONDS);
       computerPowerOffCheckingFlag = 1;
       computerNeedsToTurnBackOnFlag = 1;
     }
-    
+
     // resetESP
   } else if (payloadStr.equals(F("resetESP"))) {
     client.publish(TOPIC_T, "ESP8266 resetting");
@@ -145,30 +146,30 @@ void callback(char* topic, byte* payload, unsigned int length) {
        Serial.println(F("custom_action1CommandRecieved"));
     }
     if (deviceIsComputer) {
-      
+
     }
     if(deviceIsInfrared){
-      
+
     }
   } else if (payloadStr.equals(F("custom_action2"))) {
     if (deviceIsRelay) {
        Serial.println(F("custom_action2CommandRecieved"));
     }
     if (deviceIsComputer) {
-      
+
     }
     if(deviceIsInfrared){
-      
+
     }
   } else if (payloadStr.equals(F("custom_action3"))) {
     if (deviceIsRelay) {
        Serial.println(F("custom_action3CommandRecieved"));
     }
     if (deviceIsComputer) {
-      
+
     }
     if(deviceIsInfrared){
-      
+
     }
   } else if (payloadStr.equals(F("custom_action4"))) {
     if (deviceIsRelay) {
@@ -205,6 +206,15 @@ void reconnect() {
       Serial.println(F("connected"));
       // And resubscribe
       client.subscribe(TOPIC_T);
+
+      // Check the OTA report flag
+      if (OTAReportFlag == 1){
+        OTAReportFlag = 0;
+        client.publish(TOPIC_T, "OTA upload done, restarting ESP now.");
+        Serial.println(F("OTA Upload done"));
+        delay(1000); // Give time to read the serial message.
+        ESP.restart();
+      }
     } else {
       Serial.print(F("failed, rc="));
       Serial.print(client.state());

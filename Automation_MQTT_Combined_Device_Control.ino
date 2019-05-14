@@ -1,5 +1,9 @@
 // To change this code for a new device, make sure the config block in Secrets.h is correct.
 
+// Note: If you have just uploaded code to this board via USB you will need to manually restart the board before OTA will behave. 
+// This is usually not a big deal, but it's good to know if your board stays powered on by other means after you disconnect USB.
+// Just hitting the restart button on the board before OTA will fix this.
+
 // If your device is doing infrared emulation, you'll also need to change the on/off infrared codes in OnOffFuncs
 
 // When adding a new infrared device, run getStatusPowerDump over MQTT and it will spit out the last 60 power readings
@@ -61,6 +65,8 @@ ESP8266WiFiMulti wifiMulti;
   bool computerNeedsToTurnBackOnFlag = 0;
   bool infraredPowerOffCheckingFlag = 0;
 
+  bool OTAReportFlag = 0;
+
 void setup(void) {
   if (strcmp(OTA_HOSTNAME, "ARSandboxProjector") == 0){powerThreshold = 580;}
   if (strcmp(OTA_HOSTNAME, "SOSProjector1") == 0){powerThreshold = 600;}
@@ -116,11 +122,14 @@ void setup(void) {
   Serial.print(F("Topic set as: "));
   Serial.println(TOPIC_T);
   Serial.println(F("INIT DONE"));
-  
+  Serial.println(F("Note: If you have just uploaded code to this board via USB you will need to manually restart the board before OTA will behave."));
 }
 
 void loop(void) {
   now = millis();
+
+  yield();
+  ESP.wdtFeed();  
 
   // Connect to MQTT if we have Wi-Fi
   if (!wifiStillNeedsToConnect){
@@ -132,8 +141,8 @@ void loop(void) {
     // This is all just to increment a counter if it reads a device that's on and decrement it if it's not seeing anything
     // This is because we're reading AC and it won't always show a read even if something's on, if we read as it crosses zero volts
     // We're doing it this way and not with millis because SRAM. curState is 1 if on, 0 if off.
-
-    delay(2);  // No clue why, but it's unstable without this. Gives RC=-2 MQTT disconnect errors. Just fine with it. It's related to analogRead
+    
+    delay(3);  // No clue why, but it's unstable without this. Gives RC=-2 MQTT disconnect errors. Just fine with it. It's related to analogRead
     curState = analogRead(A0);
     
     getStatusPowerUsage[powerUsageCtr] = curState;

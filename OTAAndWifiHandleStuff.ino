@@ -1,5 +1,6 @@
-void wifiSetupOTA(){
+extern bool OTAReportFlag;
 
+void wifiSetupOTA(){
   // Port defaults to 8266
   ArduinoOTA.setPort(8266);
 
@@ -14,10 +15,6 @@ void wifiSetupOTA(){
   // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
 
   ArduinoOTA.onStart([]() {
-    client.loop();
-    client.publish(TOPIC_T, "OTA Update starting now.");
-    client.loop();
-        
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH) {
       type = "sketch";
@@ -27,25 +24,36 @@ void wifiSetupOTA(){
 
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
     Serial.println("Updating " + type);
+    Serial.println();
+    yield(); // Give the serial data time to get out before we kill it
+    delay(10);
+    Serial.end(); // Kill serial because FOR SOME REASON it's unstable when doing OTA with serial on.
+    // See https://github.com/esp8266/Arduino/issues/3881 for more information. 
+    delay(10);
   });
   
   ArduinoOTA.onEnd([]() {
+    Serial.begin(115200); // OTA is done we need serial back now
+    delay(500);
     Serial.println(F("\nEnd"));
+    OTAReportFlag = 1;
   });
   
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    //Serial.printf("Progress: %u%%\r", (progress / (total / 100))); 
+    // Can't output serial during OTA see above github issue URL for more info
   });
-  
-  // I don't think any of the MQTT messages will actually get out because we're in OTA. I should probably remove them. 
+
+  // Sent MQTT errors so user can see if there's a problem.
   ArduinoOTA.onError([](ota_error_t error) {
+    Serial.begin(115200); // OTA is having a problem we need serial back now
     Serial.printf("Error[%u]: ", error);
     if (error == OTA_AUTH_ERROR) {
       Serial.println(F("ERR: OTA Auth Failed"));
       client.publish(TOPIC_T, "ERR: OTA Auth Failed");
     } else if (error == OTA_BEGIN_ERROR) {
       Serial.println(F("ERR: OTA Begin Failed"));
-      client.publish(TOPIC_T, "ERR: OTA Begin Failed");
+      client.publish(TOPIC_T, "ERR: OTA Begin Fail. Manually reset ESP and try again. Sorry ><");
     } else if (error == OTA_CONNECT_ERROR) {
       Serial.println(F("ERR: OTA Connect Failed"));
       client.publish(TOPIC_T, "ERR: OTA Connect Failed");
@@ -57,10 +65,13 @@ void wifiSetupOTA(){
       client.publish(TOPIC_T, "ERR: OTA End Failed");
     }
   });
+
+  // We set this so we have some time after OTA to post serial messages and MQTT message
+  ArduinoOTA.setRebootOnSuccess(false);
   
   ArduinoOTA.begin();
   Serial.println(F("Ready for OTA at IP:"));
-  Serial.println(WiFi.localIP());
+  Serial.println(WiFi.localIP());  
 }
 
 void wifiSetup(){
