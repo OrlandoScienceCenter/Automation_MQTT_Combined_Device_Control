@@ -177,15 +177,17 @@ void KTTIROn(){
 // -----===== End  KT Theater Projector =====-----
 
 // -----===== Begin SOS Sanyo Proxtra Projectors =====-----
+uint16_t SoSRawPower[115] = {3452, 1722,  444, 424,  444, 1288,  450, 418,  450, 446,  422, 446,  422, 446,  424, 444,  424, 448,  420, 420,  448, 446,  422, 446,  422, 446,  422, 446,  422, 1282,  446, 450,  418, 454,  424, 418,  452, 444,  424, 444,  424, 444,  414, 454,  416, 452,  416, 452,  416, 1292,  446, 450,  418, 450,  418, 450,  418, 1286,  452, 416,  452, 418,  452, 1280,  448, 424,  444, 452,  416, 452,  418, 450,  416, 452,  416, 452,  418, 452,  416, 450,  418, 454,  414, 1290,  448, 420,  448, 1282,  444, 1288,  448, 1282,  506, 1226,  450, 418,  450, 450,  418, 1286,  452, 418,  450, 1282,  446, 422,  446, 1286,  452, 1282,  446, 1286,  452, 1280,  498};  // UNKNOWN 2899206F
+
 void SOSIROff(){
-  irsend.sendNEC(0xCC0000FF, 32);
+  irsend.sendRaw(SoSRawPower, 115, 38);
   delay(1000);
-  irsend.sendNEC(0xCC0000FF, 32);  
+  irsend.sendRaw(SoSRawPower, 115, 38);
   delay(1000);
 }
 
 void SOSIROn(){
-  irsend.sendNEC(0xCC0000FF, 32);
+  irsend.sendRaw(SoSRawPower, 115, 38);
   delay(1000);
 }
 // -----===== End SOS Sanyo Proxtra Projectors =====-----
@@ -226,13 +228,13 @@ void TheraminProjectorOn(){
 
 void TheraminProjectorOff(){
   irsend.sendRaw(theraminRawPower, 239, 38);
-  delay(500);
+  delay(1000);
   yield();
   irsend.sendRaw(theraminRawPower, 239, 38);
-  delay(500);
+  delay(300);
   yield();
   irsend.sendRaw(theraminRawPower, 239, 38);
-  delay(500);
+  delay(1000);
   yield();
 }
 

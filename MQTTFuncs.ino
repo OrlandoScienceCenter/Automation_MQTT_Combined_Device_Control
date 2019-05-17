@@ -34,7 +34,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // powerOff, powerOn, getStatus, startOTA, powerReset, resetESP
 
   // powerOff
-  if (payloadStr.equals(F("powerOff"))) {
+  if (payloadStr.equalsIgnoreCase(F("powerOff"))) {
     digitalWrite(BUILTIN_LED, HIGH);   // Turn the LED off (HIGH is off)
     if (deviceIsRelay) {
       powerOffRelay();
@@ -55,7 +55,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
     // powerOn
-  } else if (payloadStr.equals(F("powerOn"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("powerOn"))) {
     digitalWrite(BUILTIN_LED, LOW);  // Turn the LED on
     if (deviceIsRelay) {
       powerOnRelay();
@@ -68,7 +68,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
     // getStatus
-  } else if (payloadStr.equals(F("getStatus"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("getStatus"))) {
     if (deviceIsComputer) {
       if (analogRead(A0) > 900) { 
         curState = 1;
@@ -95,7 +95,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     client.publish(TOPIC_T, msg);
 
     // powerDump
-  } else if (payloadStr.equals(F("getStatusPowerDump"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("PowerDump"))) {
     if(deviceIsInfrared){
         for (int i = 0; i < numReadings; i++) {
           snprintf (msg, 40, "Power usage %d: %d", i, getStatusPowerUsage[i]);
@@ -108,7 +108,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       }
     
     // startOTA
-    } else if (payloadStr.equals(F("startOTA"))) {
+    } else if (payloadStr.equalsIgnoreCase(F("startOTA")) || payloadStr.equalsIgnoreCase(F("OTAstart"))) {
     client.publish(TOPIC_T, "OTA for 10m");
     OTAUntilMillis = now + 600 * SECONDS; // 10 minutes
     
@@ -117,7 +117,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     client.publish(TOPIC_T, msg);
 
     // powerReset
-  } else if (payloadStr.equals(F("powerReset"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("powerReset"))) {
     client.publish(TOPIC_T, "Power-cycling.");
     delay(500);
 
@@ -137,11 +137,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
     // resetESP
-  } else if (payloadStr.equals(F("resetESP"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("resetesp")) || payloadStr.equalsIgnoreCase(F("espreset"))) {
     client.publish(TOPIC_T, "ESP8266 resetting");
     delay(500);
     ESP.restart();
-  } else if (payloadStr.equals(F("custom_action1"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("custom_action1"))) {
     if (deviceIsRelay) {
        Serial.println(F("custom_action1CommandRecieved"));
     }
@@ -151,7 +151,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if(deviceIsInfrared){
 
     }
-  } else if (payloadStr.equals(F("custom_action2"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("custom_action2"))) {
     if (deviceIsRelay) {
        Serial.println(F("custom_action2CommandRecieved"));
     }
@@ -161,7 +161,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if(deviceIsInfrared){
 
     }
-  } else if (payloadStr.equals(F("custom_action3"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("custom_action3"))) {
     if (deviceIsRelay) {
        Serial.println(F("custom_action3CommandRecieved"));
     }
@@ -171,7 +171,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if(deviceIsInfrared){
 
     }
-  } else if (payloadStr.equals(F("custom_action4"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("custom_action4"))) {
     if (deviceIsRelay) {
        Serial.println(F("custom_action4CommandRecieved"));
     }
@@ -181,7 +181,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if(deviceIsInfrared){
       
     }
-  } else if (payloadStr.equals(F("custom_action5"))) {
+  } else if (payloadStr.equalsIgnoreCase(F("custom_action5"))) {
     if (deviceIsRelay) {
        Serial.println(F("custom_action5CommandRecieved"));
     }

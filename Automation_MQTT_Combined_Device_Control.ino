@@ -46,6 +46,7 @@ ESP8266WiFiMulti wifiMulti;
   unsigned long infraredPowerOffByTimeout = 0;
   
   char msg[50];
+  
   char TOPIC_T[100];
 
   unsigned int infraredTimeoutCtr = 0;
