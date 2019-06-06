@@ -96,6 +96,7 @@ void powerOffInfrared(){
     if (strcmp(OTA_HOSTNAME, "SOSProjector2") == 0){SOSIROff();}
     if (strcmp(OTA_HOSTNAME, "SOSProjector3") == 0){SOSIROff();}
     if (strcmp(OTA_HOSTNAME, "SOSProjector4") == 0){SOSIROff();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjectorHigh") == 0){SOSHighIROff();}
     if (strcmp(OTA_HOSTNAME, "KZSimOneProjector") == 0){KZSimsProjectorsOff();}
     if (strcmp(OTA_HOSTNAME, "KZSimTwoProjector") == 0){KZSimsProjectorsOff();}
     if (strcmp(OTA_HOSTNAME, "KZSimThreeProjector") == 0){KZSimsProjectorsOff();}
@@ -120,6 +121,7 @@ void powerOnInfrared(){
     if (strcmp(OTA_HOSTNAME, "SOSProjector2") == 0){SOSIROn();}
     if (strcmp(OTA_HOSTNAME, "SOSProjector3") == 0){SOSIROn();}
     if (strcmp(OTA_HOSTNAME, "SOSProjector4") == 0){SOSIROn();}
+    if (strcmp(OTA_HOSTNAME, "SOSProjectorHigh") == 0){SOSHighIROn();}
     if (strcmp(OTA_HOSTNAME, "TheraminProjector") == 0){TheraminProjectorOn();}
     if (strcmp(OTA_HOSTNAME, "KZSimOneProjector") == 0){KZSimsProjectorsOn();}
     if (strcmp(OTA_HOSTNAME, "KZSimTwoProjector") == 0){KZSimsProjectorsOn();}
@@ -144,6 +146,7 @@ void WFTVMitsubishiTVOff(){
   delay(1000);
 }
 // -----===== End Mitsubishi WFTV TV =====-----
+
 // -----===== Begin AR Sandbox BenQ Projector =====-----
 void ARSandIROff(){
   irsend.sendNEC(0xC728D, 32);
@@ -176,7 +179,7 @@ void KTTIROn(){
 }
 // -----===== End  KT Theater Projector =====-----
 
-// -----===== Begin SOS Sanyo Proxtra Projectors =====-----
+// -----===== Begin SOS Panasonic PZ Projectors =====-----
 uint16_t SoSRawPower[115] = {3452, 1722,  444, 424,  444, 1288,  450, 418,  450, 446,  422, 446,  422, 446,  424, 444,  424, 448,  420, 420,  448, 446,  422, 446,  422, 446,  422, 446,  422, 1282,  446, 450,  418, 454,  424, 418,  452, 444,  424, 444,  424, 444,  414, 454,  416, 452,  416, 452,  416, 1292,  446, 450,  418, 450,  418, 450,  418, 1286,  452, 416,  452, 418,  452, 1280,  448, 424,  444, 452,  416, 452,  418, 450,  416, 452,  416, 452,  418, 452,  416, 450,  418, 454,  414, 1290,  448, 420,  448, 1282,  444, 1288,  448, 1282,  506, 1226,  450, 418,  450, 450,  418, 1286,  452, 418,  450, 1282,  446, 422,  446, 1286,  452, 1282,  446, 1286,  452, 1280,  498};  // UNKNOWN 2899206F
 
 void SOSIROff(){
@@ -188,6 +191,20 @@ void SOSIROff(){
 
 void SOSIROn(){
   irsend.sendRaw(SoSRawPower, 115, 38);
+  delay(1000);
+}
+// -----===== End SOS Sanyo Proxtra Projectors =====-----
+
+// -----===== Begin SOS High Casio Projector =====-----
+void SOSHighIROff(){
+  irsend.sendNEC(0x212FD02F, 32);
+  delay(1000);
+  irsend.sendNEC(0x212FD02F, 32);
+  delay(1000);
+}
+
+void SOSHighIROn(){
+  irsend.sendNEC(0x212FD02F, 32);
   delay(1000);
 }
 // -----===== End SOS Sanyo Proxtra Projectors =====-----

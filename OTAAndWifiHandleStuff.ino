@@ -1,4 +1,5 @@
 extern bool OTAReportFlag;
+extern bool wifiStillNeedsToConnect;
 
 void wifiSetupOTA(){
   // Port defaults to 8266
@@ -75,29 +76,42 @@ void wifiSetupOTA(){
 }
 
 void wifiSetup(){
+  yield();
+  ESP.wdtFeed(); 
+      
   WiFi.mode(WIFI_STA);
   
   Serial.println();
   Serial.print(F("Connecting"));
 
-  wifiMulti.addAP(WIFI_1, WIFI_PSK);
-  wifiMulti.addAP(WIFI_2, WIFI_PSK);
-  wifiMulti.addAP(WIFI_3, WIFI_PSK);
-  wifiMulti.addAP(WIFI_4, WIFI_PSK);
-  wifiMulti.addAP(WIFI_5, WIFI_PSK);
-  wifiMulti.addAP(WIFI_6, WIFI_PSK);  
+  if (strcmp(ROOM_NAME, "OurPlanet") == 0){
+    // This is so the OP exhibits only can connect to the OP router, because sometimes it's off when they are getting turned on.
+    wifiMulti.addAP(WIFI_4, WIFI_PSK); // Just OP
+  } else {
+    wifiMulti.addAP(WIFI_1, WIFI_PSK);
+    wifiMulti.addAP(WIFI_2, WIFI_PSK);
+    wifiMulti.addAP(WIFI_3, WIFI_PSK);
+    wifiMulti.addAP(WIFI_4, WIFI_PSK);
+    wifiMulti.addAP(WIFI_5, WIFI_PSK);
+    wifiMulti.addAP(WIFI_6, WIFI_PSK);  
+  }
   
   int i = 0;
   while (wifiMulti.run() != WL_CONNECTED) { // Wait for the Wi-Fi to connect: scan for Wi-Fi networks, and connect to the strongest of the networks above
-    delay(1000);
+    for(int j = 0; j < 10; j++){
+      delay(100);  
+     
+      yield();
+      ESP.wdtFeed(); 
+    }
+    
     Serial.print('.');
     i++;  // Increment timeout counter
     
-    if (i > 20){
+    if (i > 10){
       // If we've been trying to connect for more than 20 seconds...
       i = 0; // Reset timeout
       break; // Dump out of the loop
-  
     }
   }
 

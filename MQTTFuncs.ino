@@ -39,6 +39,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (deviceIsRelay) {
       powerOffRelay();
     }
+    
     if (deviceIsComputer) {
       powerOffComputer();
       
@@ -46,12 +47,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
       computerPowerOffCheckingFlag = 1;
       computerNeedsToTurnBackOnFlag = 0;
     }
+    
     if(deviceIsInfrared){
       powerOffInfrared();
 
       infraredPowerOffByTimeout = now + (45 * SECONDS);
       infraredPowerOffCheckingFlag = 1;
-
     }
 
     // powerOn
@@ -196,7 +197,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void reconnect() {
   // Loop until we're reconnected
-  while (!client.connected()) {
+  if (!client.connected()) {
     Serial.print(F("Attempting MQTT connection..."));
     // Create a random client ID
     String clientId = F("ESPCli-");
